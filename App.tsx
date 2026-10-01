@@ -1,38 +1,30 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ErrorBoundary } from './src/components/common/ErrorBoundary';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { useBreedStore } from './src/store/useBreedStore';
+import { useNetworkSync } from './src/hooks/useNetworkSync';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+function MainApp(): React.JSX.Element {
+  const initialize = useBreedStore((state) => state.initialize);
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
-  return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
+  useNetworkSync();
+
+  return <RootNavigator />;
 }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
+export default function App(): React.JSX.Element {
   return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <SafeAreaProvider style={styles.container}>
+      <ErrorBoundary fallbackTitle="Tripare Explorer Encountered an Error">
+        <MainApp />
+      </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }
 
@@ -41,5 +33,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-export default App;
